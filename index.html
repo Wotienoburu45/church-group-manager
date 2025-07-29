@@ -1,120 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Church Group Manager</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Group Manager</title>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            white-space: nowrap; /* Prevent button text from wrapping */
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
+        }
+
+        .tab-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none; /* Hidden by default */
+        }
+
+        .tab-content.active {
+            display: block; /* Shown when active */
+        }
+
+        #groupList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #groupList li {
+            background-color: #e9e9e9;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #groupList li:hover {
+            background-color: #dcdcdc;
+        }
+
+        #groupSearch {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #projectContributions div {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            nav button {
+                width: 100%;
+                margin-bottom: 5px; /* Space between stacked buttons */
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Church Group Summary</h1>
+    <header>
+        <h1>Church Group Management</h1>
+    </header>
+    <nav>
+        <button id="summaryTabBtn">Summary</button>
+        <button id="importExportTabBtn">Import/Export</button>
+        <div id="groupNav"></div>
+    </nav>
 
-  <input type="text" id="searchBar" placeholder="Search group..." />
-  <ul id="groupList"></ul>
+    <main>
+        <div id="summaryTab" class="tab-content active">
+            <h2>Summary of Groups</h2>
+            <input type="text" id="groupSearch" placeholder="Search groups...">
+            <ul id="groupList">
+                </ul>
+        </div>
 
-  <button onclick="exportToExcel()">Export to Excel</button>
-  <input type="file" id="importExcel" accept=".xlsx,.csv" />
+        <div id="groupDetailTab" class="tab-content">
+            <h2 id="groupDetailTitle"></h2>
+            <div id="projectContributions">
+                </div>
+        </div>
 
-  <form name="groupSubmission" netlify netlify-honeypot="bot-field">
-    <h2>Add Contribution</h2>
-    <input type="hidden" name="form-name" value="groupSubmission" />
-    <p><input type="text" name="groupName" placeholder="Group Name" required /></p>
-    <p><input type="text" name="month" placeholder="Month (e.g. July)" required /></p>
-    <p><input type="number" name="amount" placeholder="Amount" required /></p>
-    <button type="submit">Submit</button>
-  </form>
+        <div id="importExportTab" class="tab-content">
+            <h2>Import / Export Data</h2>
+            <h3>Import Data from Excel</h3>
+            <input type="file" id="importExcel" accept=".xlsx, .xls">
+            <button id="processImport">Process Import</button>
 
-  <script src="script.js"></script>
+            <h3>Export Data to Excel</h3>
+            <button id="exportExcel">Export Current Data</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const summaryTabBtn = document.getElementById('summaryTabBtn');
+            const importExportTabBtn = document.getElementById('importExportTabBtn');
+            const summaryTab = document.getElementById('summaryTab');
+            const groupDetailTab = document.getElementById('groupDetailTab');
+            const importExportTab = document.getElementById('importExportTab');
+            const groupList = document.getElementById('groupList');
+            const groupSearch = document.getElementById('groupSearch');
+            const groupDetailTitle = document.getElementById('groupDetailTitle');
+            const projectContributions = document.getElementById('projectContributions');
+            const groupNav = document.getElementById('groupNav');
+            const importExcelInput = document.getElementById('importExcel');
+            const processImportBtn = document.getElementById('processImport');
+            const exportExcelBtn = document.getElementById('exportExcel');
+
+            // --- Data Structure (In a real app, this would come from a database) ---
+            // For client-side persistence, we'll use localStorage
+            let churchGroups = JSON.parse(localStorage.getItem('churchGroups')) || [
+                {
+                    id: 'group1', name: 'Youth Ministry',
+                    projects: {
+                        'Project A': { 'Jan': 100, 'Feb': 120, 'Mar': 90, 'Apr': 150 },
+                        'Project B': { 'Jan': 50, 'Feb': 60, 'Mar': 70, 'Apr': 80 }
+                    }
+                },
+                {
+                    id: 'group2', name: 'Women\'s Fellowship',
+                    projects: {
+                        'Project C': { 'Jan': 200, 'Feb': 210, 'Mar': 190, 'Apr': 220 },
+                        'Project A': { 'Jan': 30, 'Feb': 35, 'Mar': 40, 'Apr': 25 }
+                    }
+                },
+                {
+                    id: 'group3', name: 'Men\'s League',
+                    projects: {
+                        'Project D': { 'Jan': 80, 'Feb': 90, 'Mar': 100, 'Apr': 110 }
+                    }
+                },
+                {
+                    id: 'group4', name: 'Children\'s Church',
+                    projects: {
+                        'Project E': { 'Jan': 40, 'Feb': 45, 'Mar': 50, 'Apr': 55 }
+                    }
+                },
+                {
+                    id: 'group5', name: 'Choir',
+                    projects: {
+                        'Project F': { 'Jan': 70, 'Feb': 75, 'Mar': 80, 'Apr': 85 }
+                    }
+                },
+                {
+                    id: 'group6', name: 'Ushering Team',
+                    projects: {
+                        'Project G': { 'Jan': 60, 'Feb': 65, 'Mar': 70, 'Apr': 75 }
+                    }
+                },
+                {
+                    id: 'group7', name: 'Evangelism Unit',
+                    projects: {
+                        'Project H': { 'Jan': 110, 'Feb': 115, 'Mar': 120, 'Apr': 125 }
+                    }
+                },
+                {
+                    id: 'group8', name: 'Deacons Board',
+                    projects: {
+                        'Project I': { 'Jan': 130, 'Feb': 140, 'Mar': 150, 'Apr': 160 }
+                    }
+                }
+            ];
+
+            // Function to save data to localStorage
+            const saveData = () => {
+                localStorage.setItem('churchGroups', JSON.stringify(churchGroups));
+            };
+
+            // --- Tab Switching Logic ---
+            const switchTab = (tabToShow) => {
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                tabToShow.classList.add('active');
+            };
+
+            summaryTabBtn.addEventListener('click', () => {
+                switchTab(summaryTab);
+                renderGroupList();
+            });
+
+            importExportTabBtn.addEventListener('click', () => {
+                switchTab(importExportTab);
+            });
+
+            // --- Group List & Search ---
+            const renderGroupList = (filter = '') => {
+                groupList.innerHTML = '';
+                const filteredGroups = churchGroups.filter(group =>
+                    group.name.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                if (filteredGroups.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No groups found matching your search.';
+                    groupList.appendChild(li);
+                    return;
+                }
+
+                filteredGroups.forEach(group => {
+                    const li = document.createElement('li');
+                    li.textContent = group.name;
+                    li.dataset.groupId = group.id;
+                    li.addEventListener('click', () => showGroupDetails(group.id));
+                    groupList.appendChild(li);
+                });
+            };
+
+            groupSearch.addEventListener('input', (e) => {
+                renderGroupList(e.target.value);
+            });
+
+            // --- Dynamic Group Navigation Buttons ---
+            const renderGroupNavButtons = () => {
+                groupNav.innerHTML = '';
+                churchGroups.forEach(group => {
+                    const button = document.createElement('button');
+                    button.textContent = group.name;
+                    button.addEventListener('click', () => showGroupDetails(group.id));
+                    groupNav.appendChild(button);
+                });
+            };
+
+            // --- Group Detail View ---
+            const showGroupDetails = (groupId) => {
+                const group = churchGroups.find(g => g.id === groupId);
+                if (group) {
+                    switchTab(groupDetailTab);
+                    groupDetailTitle.textContent = Details for: ${group.name};
+                    projectContributions.innerHTML = '';
+
+                    // Check if projects exist for the group
+                    if (Object.keys(group.projects).length === 0) {
+                        projectContributions.innerHTML = '<p>No projects found for this group.</p>';
+                        return;
+                    }
+
+                    for (const projectName in group.projects) {
+                        const projectDiv = document.createElement('div');
+                        projectDiv.innerHTML = <h3>${projectName}</h3>;
+                        const ul = document.createElement('ul');
+
+                        // Check if monthly contributions exist for the project
+                        if (Object.keys(group.projects[projectName]).length === 0) {
+                            const li = document.createElement('li');
+                            li.textContent = 'No monthly contributions recorded for this project.';
+                            ul.appendChild(li);
+                        } else {
+                            for (const month in group.projects[projectName]) {
+                                const li = document.createElement('li');
+                                li.textContent = ${month}: $${group.projects[projectName][month]};
+                                ul.appendChild(li);
+                            }
+                        }
+                        projectDiv.appendChild(ul);
+                        projectContributions.appendChild(projectDiv);
+                    }
+                } else {
+                    alert('Group not found!');
+                }
+            };
+
+            // --- Excel Import/Export Logic ---
+
+            // Import
+            processImportBtn.addEventListener('click', () => {
+                const file = importExcelInput.files[0];
+                if (!file) {
+                    alert('Please select an Excel file to import.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    // header: 1 means the first row is used as headers
+                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (json.length <= 1) { // Only headers or no data
+                        alert('No data found in the Excel file beyond headers. Please ensure your Excel has data.');
+                        return;
+                    }
+
+                    const importedGroups = [];
+                    const headers = json[0];
+
+                    // Expected headers for import
+                    const groupNameCol = headers.indexOf('GroupName');
+                    const projectCol = headers.indexOf('Project');
+
+                    if (groupNameCol === -1 || projectCol === -1) {
+                        alert('Excel file must contain "GroupName" and "Project" columns.');
+                        return;
+                    }
+
+                    // Loop through each row of data (skipping the header row)
+                    for (let i = 1; i < json.length; i++) {
+                        const row = json[i];
+                        const groupName = row[groupNameCol];
+                        const projectName = row[projectCol];
+
+                        if (!groupName || !projectName) {
+                            console.warn(Skipping row ${i + 1} due to missing GroupName or Project.);
+                            continue; // Skip rows that don't have essential data
+                        }
+
+                        let group = importedGroups.find(g => g.name === groupName);
+                        if (!group) {
+                            // Generate a simple unique ID for new groups
+                            group = { id: group${Date.now() + importedGroups.length}, name: groupName, projects: {} };
+                            importedGroups.push(group);
+                        }
+
+                        const contributions = {};
+                        headers.forEach((header, colIndex) => {
+                            // All other columns are treated as months/contributions
+                            if (colIndex !== groupNameCol && colIndex !== projectCol) {
+                                const value = row[colIndex];
+                                // Ensure value is a number, default to 0 if not
+                                contributions[header] = typeof value === 'number' ? value : (parseInt(value, 10) || 0);
+                            }
+                        });
+
+                        // Merge new project data with existing, or add new project
+                        group.projects[projectName] = { ...group.projects[projectName], ...contributions };
+                    }
+
+                    churchGroups = importedGroups; // Overwrite current data with imported data
+                    saveData();
+                    alert('Data imported successfully! Check the Summary tab.');
+                    renderGroupList();
+                    renderGroupNavButtons();
+                    switchTab(summaryTab); // Switch to summary to show updated data
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            // Export
+            exportExcelBtn.addEventListener('click', () => {
+                const dataForExport = [];
+
+                // Flatten the data for easier Excel export
+                churchGroups.forEach(group => {
+                    for (const projectName in group.projects) {
+                        const row = {
+                            'GroupName': group.name,
+                            'Project': projectName,
+                        };
+                        // Add all monthly contributions to the row
+                        for (const month in group.projects[projectName]) {
+                            row[month] = group.projects[projectName][month];
+                        }
+                        dataForExport.push(row);
+                    }
+                });
+
+                if (dataForExport.length === 0) {
+                    alert('No data to export. Add some groups and projects first!');
+                    return;
+                }
+
+                const worksheet = XLSX.utils.json_to_sheet(dataForExport);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'ChurchGroupData');
+
+                // Export to .xlsx file
+                XLSX.writeFile(workbook, 'ChurchGroupContributions.xlsx');
+            });
+
+
+            // --- Initialization ---
+            renderGroupList();
+            renderGroupNavButtons();
+            switchTab(summaryTab); // Start on the summary tab
+        });
+    </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Group Contributions</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <h1 id="groupTitle">Group Name</h1>
-  <div id="monthlyContributions">
-    <h3>Monthly Contribution Summary</h3>
-    <ul id="monthList"></ul>
-  </div>
-
-  <a href="index.html">← Back to Summary</a>
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const group = params.get("name");
-    document.getElementById("groupTitle").textContent = group;
-
-    const mockData = {
-      "July": 5000,
-      "August": 3200,
-      "September": 4700
-    };
-
-    const list = document.getElementById("monthList");
-    for (const month in mockData) {
-      const item = document.createElement("li");
-      item.textContent = `${month}: KSh ${mockData[month]}`;
-      list.appendChild(item);
-    }
-  </script>
-</body>
-</html>body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f5f5f5;
-}
-h1 {
-  color: #333;
-}
-form {
-  margin-top: 20px;
-  background: #fff;
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-input, button {
-  margin-bottom: 10px;
-  padding: 8px;
-  width: 100%;
-}
-button {
-  background: #1d67c4;
-  color: white;
-  border: none;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li a {
-  text-decoration: none;
-  color: #1d67c4;
-}const groups = [
-  "Women Fellowship", "Youth Ministry", "Men’s Group", "Children Ministry",
-  "Choir", "Outreach Team", "Ushers", "Bible Study Group"
-];
-
-function renderGroupList(filtered = groups) {
-  const groupList = document.getElementById("groupList");
-  groupList.innerHTML = "";
-  filtered.forEach(group => {
-    const li = document.createElement("li");
-    li.innerHTML = `<a href="group.html?name=${group}">${group}</a>`;
-    groupList.appendChild(li);
-  });
-}
-
-document.getElementById("searchBar").addEventListener("input", e => {
-  const query = e.target.value.toLowerCase();
-  const filtered = groups.filter(g => g.toLowerCase().includes(query));
-  renderGroupList(filtered);
-});
-
-function exportToExcel() {
-  alert("Export to Excel feature coming soon!");
-}
-
-window.onload = renderGroupList;
-
-    
+</html>
