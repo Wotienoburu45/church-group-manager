@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>PAG Mathare North Group Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="enhanced_styles.css"/>
+  <style>
+    body { background: #f5f7fa; font-family: 'Montserrat', Arial, sans-serif; }
+    .navbar { box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .navbar-brand { font-weight: bold; color: #2176ae !important; letter-spacing: 3px; }
+    .nav-link, .dropdown-item { font-weight: 500; }
+    .nav-link.active, .dropdown-item.active { color: #2176ae !important; }
+    .hero-header {
+      background: linear-gradient(90deg, #2176ae 0%, #57b8ff 100%);
+      color: white;
+      padding: 3rem 1rem 2rem 1rem;
+      text-align: center;
+      border-radius: 0 0 2rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(33,118,174,0.12);
+    }
+    .hero-header h1 { font-size: 2.6rem; font-weight: bold; letter-spacing: 2px; }
+    .hero-header p { font-size: 1.12rem; margin-top: 1rem; }
+    .dashboard-cards { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+    .dashboard-card {
+      background: linear-gradient(135deg, #fff 70%, #eaf6ff 100%);
+      min-width: 220px;
+      border-radius: 1.2rem;
+      box-shadow: 0 2px 12px #2176ae1a;
+      padding: 1.3rem 1.7rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      transition: box-shadow 0.2s;
+      border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .dashboard-card:hover { box-shadow: 0 4px 24px #2176ae2a; }
+    .dashboard-card h5 { color: #2176ae; font-weight: bold; }
+    .dashboard-card .icon {
+      font-size: 2.4rem;
+      color: #57b8ff;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .filter-bar { gap: 1rem; margin-bottom: 1.5rem; }
+    .table thead th { background: #eaf6ff; }
+    .edit-btn, .del-btn {
+      border: none; background: none; cursor: pointer; color: #2176ae; font-weight: 500; font-size: 0.97em; padding: 0 4px;
+    }
+    .edit-btn:hover, .del-btn:hover { text-decoration: underline; color: #57b8ff; }
+    .upload-area {
+      border: 2px dashed #2176ae;
+      border-radius: 1.2rem;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      margin: 2rem 0;
+      background: #eaf6ff;
+      color: #2176ae;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 1.05rem;
+    }
+    .upload-area.dragover { background: #c8e6fd; }
+    .group-header { display: flex; align-items: center; gap: 1rem; }
+    .group-header h2 { color: #2176ae; font-weight: bold; }
+    .group-tab {
+      background: linear-gradient(90deg, #fff 70%, #eaf6ff 100%);
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px #2176ae17;
+      padding: 0.7rem 1.2rem;
+      margin-bottom: 1.2rem;
+      font-weight: bold;
+      color: #2176ae;
+      display: inline-block;
+    }
+    input[type="text"], input[type="number"], input[type="month"], input[type="date"], select {
+      border-radius: 7px;
+      border: 1px solid #b1cbe2;
+      padding: 0.39rem 0.7rem;
+      font-size: 1rem;
+      background: #fafdff;
+      margin-right: 0.15rem;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="month"]:focus, input[type="date"]:focus, select:focus {
+      border: 1.5px solid #57b8ff;
+      box-shadow: 0 0 0 2px #bfe8ff33;
+      outline: none;
+    }
+    .btn-primary, .btn-success, .btn-outline-secondary, .btn-outline-primary {
+      border-radius: 7px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 1.01rem;
+    }
+    .alert-info { background: #eaf6ff; color: #2176ae; border: none; }
+    .alert-success { background: #e4fdea; color: #1c9c41; border: none; }
+    .alert-danger { background: #fdeaea; color: #c90c0c; border: none; }
+    .footer { background: #eaf6ff; color: #2176ae; border-radius: 1.5rem 1.5rem 0 0; padding: 1rem 0; margin-top: 2rem; }
+
+    /* Project Status Styles */
+    .project-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-ongoing { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .status-completed { background: #d4edda; color: #155724; border: 1px solid #00b894; }
+    .status-cancelled { background: #f8d7da; color: #721c24; border: 1px solid #e17055; }
+
+    /* Member Search Styles */
+    .member-search-container {
+      background: linear-gradient(135deg, #fff 70%, #eaf6ff 100%);
+      border-radius: 1.2rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 2px 12px #2176ae1a;
+    }
+    .search-results {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background: white;
+      margin-top: 1rem;
+    }
+    .search-result-item {
+      padding: 1rem;
+      border-bottom: 1px solid #f1f1f1;
+      transition: background 0.2s;
+    }
+    .search-result-item:hover {
+      background: #f8f9fa;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .member-performance {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .performance-metrics {
+      display: flex;
+      gap: 1rem;
+      margin: 0.5rem 0;
+    }
+    .metric {
+      text-align: center;
+      padding: 0.5rem;
+      background: #f8f9fa;
+      border-radius: 6px;
+      min-width: 80px;
+    }
+    .metric-value {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #2176ae;
+    }
+    .metric-label {
+      font-size: 0.8em;
+      color: #666;
+    }
+    .help-eligibility {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      margin: 0.5rem 0;
+    }
+    .help-eligible {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .help-not-eligible {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .help-review {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    /* Project management styles */
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #2176ae;
+    }
+    .project-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .project-info {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-cards { flex-direction: column; align-items: stretch; }
+      .dashboard-card { width: 100%; min-width: unset; }
+      .filter-bar { flex-direction: column; }
+      .hero-header { padding: 2rem 0.3rem 1.2rem 0.3rem; }
+      .member-performance { flex-direction: column; align-items: stretch; }
+      .performance-metrics { justify-content: center; }
+      .project-item { flex-direction: column; align-items: stretch; }
+      .project-actions { justify-content: center; margin-top: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+<!-- DIRECT TITHE MANAGEMENT ACCESS -->
+<div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff6b6b; padding: 10px 15px; border-radius: 25px; box-shadow: 0 4px 15px rgba(255,107,107,0.4);">
+  <a href="#" onclick="setState({page:'tithe-management'})" style="color: white; text-decoration: none; font-weight: bold; font-size: 14px;">💰 TITHE SYSTEM</a>
+</div>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// --- Ranking helpers ---
+function getAllMemberPerformances(groups) {
+  let memberMap = {};
+  groups.forEach(g => {
+    g.members.forEach(m => {
+      if (!memberMap[m.name]) {
+        memberMap[m.name] = { name: m.name, status: m.status, group: g.name, total: 0 };
+      }
+    });
+    g.contributions.forEach(c => {
+      if (!memberMap[c.member]) {
+        // Handles case where a member contributed but is not in group.members
+        memberMap[c.member] = { name: c.member, status: '', group: g.name, total: 0 };
+      }
+      memberMap[c.member].total += Number(c.amount || 0);
+    });
+  });
+  return Object.values(memberMap)
+    .sort((a, b) => b.total - a.total);
+}
+function getGroupRankings(groups) {
+  return groups
+    .map(g => ({
+      name: g.name,
+      leader: g.leader,
+      totalContributions: g.contributions.reduce((sum, c) => sum + Number(c.amount || 0), 0),
+      totalMembers: g.members.length
+    }))
+    .sort((a, b) => b.totalContributions - a.totalContributions);
+}
+</script>
+
+<script>
+
+// --------- [ENHANCED: Group structure with project status] ----------
+const defaultGroups = Array.from({length: 8}, (_,i) => ({
+  id: i+1,
+  name: `Group ${i+1}`,
+  leader: "",
+  members: [],
+  projects: [],
+  contributions: []
+}));
+
+// --- New helper functions for project management and member search ---
+function getProjectStatus(project, contributions) {
+  // Determine project status based on contributions and explicit status
+  if (project.status) return project.status;
+
+  const projectContribs = contributions.filter(c => c.project === project.name);
+  const totalAmount = projectContribs.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+
+  // Auto-determine status based on activity
+  const lastContribDate = projectContribs.length > 0 ?
+    Math.max(...projectContribs.map(c => new Date(c.date || '1970-01-01').getTime())) : 0;
+  const daysSinceLastContrib = (Date.now() - lastContribDate) / (1000 * 60 * 60 * 24);
+
+  if (totalAmount === 0) return 'ongoing';
+  if (daysSinceLastContrib > 90) return 'completed'; // No activity for 90+ days = completed
+  return 'ongoing';
+}
+
+function getProjectStatusBadge(status) {
+  const badges = {
+    ongoing: '<span class="project-status status-ongoing">🔄 Ongoing</span>',
+    completed: '<span class="project-status status-completed">✅ Completed</span>',
+    cancelled: '<span class="project-status status-cancelled">❌ Cancelled</span>'
+  };
+  return badges[status] || badges.ongoing;
+}
+
+function getMemberPerformanceData(memberName, groups) {
+  let memberData = {
+    name: memberName,
+    groups: [],
+    totalContributions: 0,
+    projectsParticipated: [],
+    status: 'unknown',
+    lastActivity: null,
+    helpEligibility: 'unknown'
+  };
+
+  groups.forEach(group => {
+    const member = group.members.find(m => m.name === memberName);
+    if (member) {
+      memberData.groups.push(group.name);
+      memberData.status = member.status;
+    }
+
+    // Get contributions
+    const memberContribs = group.contributions.filter(c => c.member === memberName);
+    memberContribs.forEach(contrib => {
+      memberData.totalContributions += Number(contrib.amount || 0);
+      if (contrib.project && !memberData.projectsParticipated.includes(contrib.project)) {
+        memberData.projectsParticipated.push(contrib.project);
+      }
+      if (contrib.date) {
+        const contribDate = new Date(contrib.date);
+        if (!memberData.lastActivity || contribDate > memberData.lastActivity) {
+          memberData.lastActivity = contribDate;
+        }
+      }
+    });
+  });
+
+  // Calculate help eligibility
+  memberData.helpEligibility = calculateHelpEligibility(memberData);
+
+  return memberData;
+}
+
+function calculateHelpEligibility(memberData) {
+  const { totalContributions, status, lastActivity, projectsParticipated } = memberData;
+
+  // Eligibility criteria
+  const minContribution = 5000; // Minimum KES contribution
+  const minProjects = 2; // Minimum projects participated
+  const maxInactivityDays = 180; // Maximum days since last activity
+
+  let score = 0;
+  let reasons = [];
+
+  // Contribution score (40%)
+  if (totalContributions >= minContribution) {
+    score += 40;
+  } else {
+    reasons.push(`Low contributions (KES ${totalContributions.toLocaleString()} < KES ${minContribution.toLocaleString()})`);
+  }
+
+  // Project participation score (30%)
+  if (projectsParticipated.length >= minProjects) {
+    score += 30;
+  } else {
+    reasons.push(`Few projects (${projectsParticipated.length} < ${minProjects})`);
+  }
+
+  // Activity score (20%)
+  if (lastActivity) {
+    const daysSinceActivity = (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24);
+    if (daysSinceActivity <= maxInactivityDays) {
+      score += 20;
+    } else {
+      reasons.push(`Inactive for ${Math.round(daysSinceActivity)} days`);
+    }
+  } else {
+    reasons.push('No recorded activity');
+  }
+
+  // Status score (10%)
+  if (status === 'active') {
+    score += 10;
+  } else if (status === 'inactive') {
+    reasons.push('Member status: inactive');
+  } else if (status === 'dormant') {
+    reasons.push('Member status: dormant');
+  }
+
+  // Determine eligibility
+  if (score >= 80) return { level: 'eligible', score, reasons: [] };
+  if (score >= 60) return { level: 'review', score, reasons };
+  return { level: 'not_eligible', score, reasons };
+}
+
+function searchMembers(searchTerm) {
+  if (!searchTerm || searchTerm.length < 2) return [];
+
+  const results = [];
+  const searchLower = searchTerm.toLowerCase();
+
+  state.groups.forEach(group => {
+    group.members.forEach(member => {
+      if (member.name.toLowerCase().includes(searchLower)) {
+        const memberData = getMemberPerformanceData(member.name, state.groups);
+        results.push(memberData);
+      }
+    });
+  });
+
+  // Remove duplicates and sort by total contributions
+  const uniqueResults = results.filter((member, index, self) =>
+    index === self.findIndex(m => m.name === member.name)
+  );
+
+  return uniqueResults.sort((a, b) => b.totalContributions - a.totalContributions);
+}
+
+let state = {
+  groups: JSON.parse(localStorage.getItem('pag_groups') || 'null') || JSON.parse(JSON.stringify(defaultGroups)),
+  page: 'home',
+  activeGroup: 1,
+  filters: {},
+  permission: 'admin',
+  importError: '',
+  imported: false,
+  useDatabase: true, // Toggle between localStorage and MySQL
+  syncStatus: 'idle', // idle, syncing, synced, error
+  churchSettings: {
+    church_name: 'PAG Mathare North Assembly',
+    logo_url: 'https://img.icons8.com/ios-filled/90/ffffff/church--v1.png'
+  }
+};
+
+function saveState() {
+  localStorage.setItem('pag_groups', JSON.stringify(state.groups));
+}
+
+function setState(partial) {
+  Object.assign(state, partial);
+  saveState();
+  render();
+
+  // Auto-save to database when groups data changes
+  if (partial.groups && state.useDatabase) {
+    saveToDatabase();
+  }
+}
+
+function unique(arr, key) {
+  return [...new Map(arr.map(item => [item[key], item])).values()];
+}
+
+function getGroupStats(group) {
+  return {
+    totalMembers: group.members.length,
+    totalProjects: group.projects.length,
+    totalContributions: group.contributions.reduce((s,c) => s + Number(c.amount||0), 0)
+  };
+}
+
+function filterMembers(members, filters) {
+  return members.filter(m => {
+    if (filters.name && !m.name.toLowerCase().includes(filters.name.toLowerCase())) return false;
+    if (filters.status && m.status !== filters.status) return false;
+    return true;
+  });
+}
+
+function refreshData() {
+  if (state.useDatabase) {
+    loadFromDatabase();
+  } else {
+    state.groups = JSON.parse(localStorage.getItem('pag_groups') || 'null') || JSON.parse(JSON.stringify(defaultGroups));
+    render();
+  }
+}
+
+// Database Integration Functions
+async function loadFromDatabase() {
+  try {
+    setState({syncStatus: 'syncing'});
+    const response = await fetch('/tutirials/api/groups_json.php');
+    const data = await response.json();
+
+    if (response.ok && Array.isArray(data)) {
+      setState({groups: data, syncStatus: 'synced'});
+      // Also update localStorage as backup
+      localStorage.setItem('pag_groups', JSON.stringify(data));
+    } else {
+      throw new Error('Failed to load from JSON backend');
+    }
+  } catch (error) {
+    console.error('JSON backend load failed:', error);
+    setState({syncStatus: 'error'});
+    // Fallback to localStorage
+    state.groups = JSON.parse(localStorage.getItem('pag_groups') || 'null') || JSON.parse(JSON.stringify(defaultGroups));
+    render();
+  }
+}
+
+async function saveToDatabase() {
+  if (!state.useDatabase) return;
+
+  try {
+    console.log('Saving to database...', state.groups.length, 'groups');
+    setState({syncStatus: 'syncing'});
+
+    const response = await fetch('/tutirials/api/groups_json.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({groups: state.groups})
+    });
+
+    console.log('Database save response status:', response.status);
+
+    const result = await response.json();
+    console.log('Database save result:', result);
+
+    if (response.ok && result.success) {
+      setState({syncStatus: 'synced'});
+      console.log('✅ Data saved successfully to database!');
+    } else {
+      throw new Error(result.message || 'Save failed');
+    }
+  } catch (error) {
+    console.error('❌ JSON backend save failed:', error);
+    setState({syncStatus: 'error'});
+
+    // Show user-friendly error message
+    alert('Failed to save data to database: ' + error.message);
+  }
+}
+
+// Church Settings Functions
+async function loadChurchSettings() {
+  try {
+    const response = await fetch('/tutirials/api/church_settings.php');
+    const settings = await response.json();
+
+    if (response.ok) {
+      setState({churchSettings: settings});
+      console.log('✅ Church settings loaded:', settings);
+    } else {
+      throw new Error('Failed to load church settings');
+    }
+  } catch (error) {
+    console.error('❌ Failed to load church settings:', error);
+  }
+}
+
+async function saveChurchSettings(settings) {
+  try {
+    const response = await fetch('/tutirials/api/church_settings.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(settings)
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      setState({churchSettings: result.settings});
+      console.log('✅ Church settings saved successfully!');
+      return result;
+    } else {
+      throw new Error(result.message || 'Save failed');
+    }
+  } catch (error) {
+    console.error('❌ Failed to save church settings:', error);
+    throw error;
+  }
+}
+
+async function uploadChurchLogo(formData) {
+  try {
+    const response = await fetch('/tutirials/api/church_settings.php', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      setState({churchSettings: result.settings});
+      console.log('✅ Church logo uploaded successfully!');
+      return result;
+    } else {
+      throw new Error(result.message || 'Upload failed');
+    }
+  } catch (error) {
+    console.error('❌ Failed to upload church logo:', error);
+    throw error;
+  }
+}
+
+// Initialize database on page load
+window.addEventListener('load', function() {
+  if (state.useDatabase) {
+    loadFromDatabase();
+  }
+  loadChurchSettings();
+});
+
+// --- UI Functions ---
+function navBar() {
+  const groups = state.groups;
+  return `
+  <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <div class="container-fluid">
+      <span class="navbar-brand">PAG Manager</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link${state.page==='home'?' active':''}" href="#" onclick="setState({page:'home'})">Home</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='summary'?' active':''}" href="#" onclick="setState({page:'summary'})">Summary</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='ranking'?' active':''}" href="#" onclick="setState({page:'ranking'})">Ranking</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Groups</a>
+            <ul class="dropdown-menu">
+              ${groups.map((g,i) =>
+                `<li><a class="dropdown-item${state.page===`group-${g.id}`?' active':''}" href="#" onclick="setState({page:'group-${g.id}',activeGroup:${g.id}})">${g.name}</a></li>`
+              ).join('')}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item${state.page==='tithe-management'?' active':''}" href="#" onclick="setState({page:'tithe-management'})" style="color: #e67e22; font-weight: bold;">💰 Group 9 - Tithe Management</a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link${state.page==='projects'?' active':''}" href="#" onclick="setState({page:'projects'})">Projects</a></li>
+          <li class="nav-item" style="border: 2px solid red; background: yellow;"><a class="nav-link${state.page==='tithe-management'?' active':''}" href="#" onclick="setState({page:'tithe-management'})" style="color: #e67e22; font-weight: bold; font-size: 18px;">💰 TITHE MANAGEMENT</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='member-search'?' active':''}" href="#" onclick="setState({page:'member-search'})">Member Search</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='import'?' active':''}" href="#" onclick="setState({page:'import'})">Import</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='export'?' active':''}" href="#" onclick="setState({page:'export'})">Export</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='edit'?' active':''}" href="#" onclick="setState({page:'edit'})">Edit</a></li>
+          <li class="nav-item"><a class="nav-link${state.page==='settings'?' active':''}" href="#" onclick="setState({page:'settings'})">Settings</a></li>
+        </ul>
+        <button class="btn btn-outline-primary btn-sm refresh-btn" onclick="refreshData()" title="Reload from local storage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+            <path d="M2 2a.5.5 0 0 1 .5.5V5a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1 0-1h.793A6.5.5 0 1 1 8 14.5a.5.5 0 0 1 0-1A5.5 5.5 0 1 0 2.5 5h.793A.5.5 0 0 1 2 5V2.5A.5.5 0 0 1 2.5 2z"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </nav>`;
+}
+
+function homePage() {
+  return `
+  <div class="hero-header">
+    <img src="https://img.icons8.com/ios-filled/90/ffffff/teamwork--v1.png" alt="Groups" style="margin-bottom:1rem;"/>
+    <h1>PAG Mathare North Assembly</h1>
+    <p>
+      Welcome to your all-in-one platform for tracking group contributions, projects, and member engagement.<br>
+      <span style="font-weight:500;color: #e9f5ff">Easily manage, analyze, and celebrate your ministry progress.</span>
+    </p>
+  </div>
+  <div class="container text-center">
+    <span style="font-size:1.2rem;color:#2176ae">
+      <b>Get started</b> by selecting a group or viewing the summary!
+    </span>
+  </div>
+  `;
+}
+
+function groupLeadersTable() {
+  return `
+    <div class="mt-5">
+      <h5>Group Leaders</h5>
+      <table class="table table-bordered">
+        <thead>
+          <tr><th>Group</th><th>Leader</th></tr>
+        </thead>
+        <tbody>
+          ${state.groups.map(g => `<tr><td>${g.name}</td><td>${g.leader || '<span class="text-muted">None assigned</span>'}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function dashboard() {
+  const groups = state.groups;
+  const filters = state.filters;
+  const filteredGroups = groups.map(g => {
+    let members = filterMembers(g.members, {name: filters.memberName, status: filters.status});
+    let contributions = g.contributions.filter(c => {
+      let ok = true;
+      if (filters.month) ok = ok && (c.date||'').slice(0,7)===filters.month;
+      if (filters.project && filters.project!=='all') ok = ok && c.project===filters.project;
+      if (filters.memberName) ok = ok && c.member && c.member.toLowerCase().includes(filters.memberName.toLowerCase());
+      return ok;
+    });
+    return {...g, members, contributions};
+  });
+  let activeMembers = [], inactiveMembers = [], dormantMembers = [];
+  filteredGroups.forEach(g => {
+    g.members.forEach(m => {
+      if (m.status==='active') activeMembers.push(m.name);
+      else if (m.status==='inactive') inactiveMembers.push(m.name);
+      else dormantMembers.push(m.name);
+    });
+  });
+  const allProjects = unique(groups.flatMap(g=>g.projects), "name");
+  const months = unique(groups.flatMap(g=>g.contributions.map(c=>(c.date||"").slice(0,7))).filter(Boolean).map(m=>({label:m,value:m})),'value');
+
+  return `
+  <div>
+    <div class="d-flex align-items-center justify-content-between" style="margin-bottom:1rem;">
+      <h2 style="color:#2176ae;font-weight:bold;">Summary Dashboard</h2>
+      <button class="btn btn-outline-primary btn-sm refresh-btn" onclick="refreshData()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+          <path d="M2 2a.5.5 0 0 1 .5.5V5a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1 0-1h.793A6.5.5 0 1 1 8 14.5a.5.5 0 0 1 0-1A5.5 5.5 0 1 0 2.5 5h.793A.5.5 0 0 1 2 5V2.5A.5.5 0 0 1 2.5 2z"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+    <div class="d-flex flex-wrap filter-bar align-items-center">
+      <div>
+        <label>Month: </label>
+        <select onchange="state.filters.month=this.value; render()">
+          <option value="">All</option>
+          ${months.map(m=>`<option value="${m.value}"${state.filters.month===m.value?' selected':''}>${m.value}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Project: </label>
+        <select onchange="state.filters.project=this.value; render()">
+          <option value="all">All</option>
+          ${allProjects.map(p=>`<option value="${p.name}"${state.filters.project===p.name?' selected':''}>${p.name}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Member Name: </label>
+        <input type="text" value="${state.filters.memberName||''}" oninput="state.filters.memberName=this.value; render()"/>
+      </div>
+      <div>
+        <label>Status: </label>
+        <select onchange="state.filters.status=this.value; render()">
+          <option value="">All</option>
+          <option value="active"${state.filters.status==='active'?' selected':''}>Active</option>
+          <option value="inactive"${state.filters.status==='inactive'?' selected':''}>Inactive</option>
+          <option value="dormant"${state.filters.status==='dormant'?' selected':''}>Dormant</option>
+        </select>
+      </div>
+    </div>
+    <div class="dashboard-cards">
+      ${filteredGroups.map((g,idx) => {
+        const stats = getGroupStats(g);
+        return `<div class="dashboard-card" onclick="setState({page:'group-${g.id}',activeGroup:${g.id}})" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 32px #2176ae3a';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 12px #2176ae1a';">
+          <div class="icon">👥</div>
+          <h5>${g.name}</h5>
+          <div style="font-size:1.1rem;margin-top:0.5rem;">Members: <b>${stats.totalMembers}</b></div>
+          <div>Projects: <b>${stats.totalProjects}</b></div>
+          <div>Contributions: <b style="color:#1c9c41;">KES ${stats.totalContributions.toLocaleString()}</b></div>
+          <div style="margin-top: 0.8rem; font-size: 0.9rem; color: #666;">📱 Click to manage group</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered">
+        <thead>
+          <tr><th>Group</th><th>Total Members</th><th>Projects</th><th>Total Contributions</th></tr>
+        </thead>
+        <tbody>
+          ${filteredGroups.map((g,idx) => {
+            const stats = getGroupStats(g);
+            return `<tr>
+              <td>${g.name}</td>
+              <td>${stats.totalMembers}</td>
+              <td>${stats.totalProjects}</td>
+              <td>KES ${stats.totalContributions.toLocaleString()}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-4"><h6>Active Members</h6><ul>${activeMembers.map(n=>`<li>${n}</li>`).join('')}</ul></div>
+      <div class="col-md-4"><h6>Inactive Members</h6><ul>${inactiveMembers.map(n=>`<li>${n}</li>`).join('')}</ul></div>
+      <div class="col-md-4"><h6>Dormant Members</h6><ul>${dormantMembers.map(n=>`<li>${n}</li>`).join('')}</ul></div>
+    </div>
+    ${groupLeadersTable()}
+  </div>`;
+}
+
+// ---- Ranking Page ----
+function rankingPage() {
+  const groups = state.groups;
+  const memberPerformances = getAllMemberPerformances(groups).filter(m=>m.total>0);
+  const groupRankings = getGroupRankings(groups);
+
+  let memberRankingHtml = `
+    <div class="mt-4">
+      <h5>Top Performing Members</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Group</th><th>Status</th><th>Total Contributions</th></tr>
+          </thead>
+          <tbody>
+            ${memberPerformances.map((m,i)=>`
+              <tr>
+                <td>${i+1}</td>
+                <td>${m.name}</td>
+                <td>${m.group}</td>
+                <td>${m.status||'<span class="text-muted">-</span>'}</td>
+                <td>KES ${m.total.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  let groupRankingHtml = `
+    <div class="mt-4">
+      <h5>Group Rankings</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead>
+            <tr><th>#</th><th>Group</th><th>Leader</th><th>Members</th><th>Total Contributions</th></tr>
+          </thead>
+          <tbody>
+            ${groupRankings.map((g,i)=>`
+              <tr>
+                <td>${i+1}</td>
+                <td>${g.name}</td>
+                <td>${g.leader || '<span class="text-muted">-</span>'}</td>
+                <td>${g.totalMembers}</td>
+                <td>KES ${g.totalContributions.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  return `
+    <div>
+      <h2 style="color:#2176ae;font-weight:bold;">Rankings</h2>
+      ${memberRankingHtml}
+      ${groupRankingHtml}
+    </div>
+  `;
+}
+
+function groupPage(idx) {
+  const group = state.groups[idx];
+
+  window._assignLeader = function(e) {
+    const leader = e.target.value;
+    const newGroups = state.groups.map((g, i) => i === idx ? {...g, leader} : g);
+    setState({groups: newGroups});
+  };
+
+  window._groupAddMember = function(e) {
+    e.preventDefault();
+    const name = e.target.memberName.value.trim();
+    const status = e.target.memberStatus.value;
+    if (!name) return;
+    const updatedMembers = [...group.members, {name, status}];
+    updateGroup(idx, {members: updatedMembers});
+    e.target.reset();
+  };
+
+  window._groupAddProject = function(e) {
+    e.preventDefault();
+    const name = e.target.projectName.value.trim();
+    const date = e.target.projectDate.value;
+    if (!name) return;
+    const updatedProjects = [...group.projects, {name, date}];
+    updateGroup(idx, {projects: updatedProjects});
+    e.target.reset();
+  };
+
+  window._groupAddContrib = function(e) {
+    e.preventDefault();
+    const member = e.target.contribMember.value;
+    const amount = +e.target.contribAmount.value;
+    const project = e.target.contribProject.value;
+    const date = e.target.contribDate.value;
+    if (!member || !amount) return;
+    const updatedContribs = [...group.contributions, {member, amount, project, date}];
+    updateGroup(idx, {contributions: updatedContribs});
+    e.target.reset();
+  };
+
+  window._groupRename = function() {
+    const newName = prompt('Group name:', group.name);
+    if (newName && newName.length>1) {
+      updateGroup(idx, {name: newName});
+    }
+  };
+
+  window._groupDeleteMember = function(name) {
+    if (!confirm('Remove member?')) return;
+    updateGroup(idx, {
+      members: group.members.filter(m=>m.name!==name),
+      contributions: group.contributions.filter(c=>c.member!==name)
+    });
+  };
+
+  window._groupDeleteProject = function(name) {
+    if (!confirm('Remove project?')) return;
+    updateGroup(idx, {
+      projects: group.projects.filter(p=>p.name!==name),
+      contributions: group.contributions.filter(c=>c.project!==name)
+    });
+  };
+
+  window._groupDeleteContrib = function(idx2) {
+    if (!confirm('Delete this contribution?')) return;
+    const updated = [...group.contributions];
+    updated.splice(idx2,1);
+    updateGroup(idx, {contributions: updated});
+  };
+
+  window._groupEditMemberStatus = function(name, sel) {
+    const updatedMembers = group.members.map(m=>m.name===name?{...m,status:sel.value}:m);
+    updateGroup(idx, {members: updatedMembers});
+  };
+
+  function updateGroup(groupIdx, newData) {
+    const newGroups = state.groups.map((g,i) => i===groupIdx ? {...g, ...newData} : g);
+    setState({groups: newGroups});
+  }
+
+  return `
+  <div>
+    <span class="group-tab">${group.name}</span>
+    <button class="edit-btn" onclick="_groupRename()">Rename</button>
+    <button class="btn btn-outline-primary btn-sm refresh-btn" onclick="refreshData()" style="margin-left:10px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+        <path d="M2 2a.5.5 0 0 1 .5.5V5a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1 0-1h.793A6.5.5 0 1 1 8 14.5a.5.5 0 0 1 0-1A5.5 5.5 0 1 0 2.5 5h.793A.5.5 0 0 1 2 5V2.5A.5.5 0 0 1 2.5 2z"/>
+      </svg>
+      Refresh
+    </button>
+    <div class="mt-3">
+      <label><b>Group Leader:</b></label>
+      <select onchange="_assignLeader(event)">
+        <option value="">-- Assign Leader --</option>
+        ${group.members.map(m =>
+          `<option value="${m.name}"${group.leader === m.name ? " selected" : ""}>${m.name}</option>`
+        ).join('')}
+      </select>
+      ${group.leader ? `<span class="badge bg-success ms-2">${group.leader}</span>` : ""}
+    </div>
+    <div class="row">
+      <div class="col-md-6 mt-3">
+        <h5>Members</h5>
+        <ul>
+          ${group.members.map(m =>
+            `<li>${m.name} <span class="text-secondary small">(${m.status})</span>
+              <select onchange="_groupEditMemberStatus('${m.name}',this)">
+                <option value="active"${m.status==='active'?' selected':''}>Active</option>
+                <option value="inactive"${m.status==='inactive'?' selected':''}>Inactive</option>
+                <option value="dormant"${m.status==='dormant'?' selected':''}>Dormant</option>
+              </select>
+              <button class="del-btn ms-2" onclick="_groupDeleteMember('${m.name}')">Delete</button>
+            </li>`
+          ).join('')}
+        </ul>
+        <form class="d-flex gap-2 mb-3" onsubmit="_groupAddMember(event)">
+          <input name="memberName" type="text" placeholder="Add Member"/>
+          <select name="memberStatus">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="dormant">Dormant</option>
+          </select>
+          <button type="submit" class="btn btn-sm btn-primary">Add</button>
+        </form>
+      </div>
+      <div class="col-md-6 mt-3">
+        <h5>Projects</h5>
+        <ul>
+          ${group.projects.map(p =>
+            `<li>${p.name} <span class="text-secondary small">(${p.date})</span>
+              <button class="del-btn ms-2" onclick="_groupDeleteProject('${p.name}')">Delete</button>
+            </li>`
+          ).join('')}
+        </ul>
+        <form class="d-flex gap-2 mb-3" onsubmit="_groupAddProject(event)">
+          <input name="projectName" type="text" placeholder="Add Project"/>
+          <input name="projectDate" type="month"/>
+          <button type="submit" class="btn btn-sm btn-primary">Add</button>
+        </form>
+      </div>
+    </div>
+    <h5 class="mt-4">Contributions</h5>
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Member</th><th>Amount</th><th>Project</th><th>Date</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${group.contributions.map((c,i) =>
+            `<tr>
+              <td>${c.member}</td>
+              <td>KES ${c.amount?.toLocaleString()}</td>
+              <td>${c.project}</td>
+              <td>${c.date}</td>
+              <td><button class="del-btn" onclick="_groupDeleteContrib(${i})">Delete</button></td>
+            </tr>`
+          ).join('')}
+        </tbody>
+      </table>
+    </div>
+    <form class="d-flex gap-2 mb-3" onsubmit="_groupAddContrib(event)">
+      <select name="contribMember" required>
+        <option value="">Select Member</option>
+        ${group.members.map(m=>`<option value="${m.name}">${m.name}</option>`).join('')}
+      </select>
+      <input name="contribAmount" type="number" min="1" placeholder="KES Amount" required/>
+      <select name="contribProject">
+        <option value="">Project</option>
+        ${group.projects.map(p=>`<option value="${p.name}">${p.name}</option>`).join('')}
+      </select>
+      <input name="contribDate" type="date"/>
+      <button type="submit" class="btn btn-sm btn-primary">Add Contribution</button>
+    </form>
+  </div>`;
+}
+
+// [importPage, exportPage, editPanel remain the same as above, you can copy them from previous code]
+
+function importPage()  {
+  window._importFile = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const workbook = XLSX.read(evt.target.result, {type:'binary'});
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet);
+        const newGroups = JSON.parse(JSON.stringify(defaultGroups));
+        for (const row of json) {
+          const gidx = Number((row.Group||'').replace(/[^0-9]/g,'')) - 1;
+          if (gidx<0 || gidx>=8) continue;
+          const group = newGroups[gidx];
+          if (row.Member && !group.members.some(m=>m.name===row.Member)) {
+            group.members.push({name:row.Member, status:row.Status||"active"});
+          }
+          if (row.Project && !group.projects.some(p=>p.name===row.Project)) {
+            group.projects.push({name:row.Project, date:row.Date||''});
+          }
+          if (row.Contribution && row.Member) {
+            group.contributions.push({
+              member: row.Member,
+              amount: Number(row.Contribution||0),
+              project: row.Project||'',
+              date: row.Date||'',
+            });
+          }
+        }
+        setState({groups: newGroups, importError: '', imported: true});
+      } catch(e) {
+        setState({importError: "Import failed: "+e.message});
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+  return `
+  <div>
+    <h2 style="color:#2176ae;font-weight:bold;">Import Data from Excel</h2>
+    <div class="upload-area">
+      <p>
+        <span style="font-size:1.25rem;">📥</span><br>
+        <b>Drag & drop</b> or <b>click</b> to select your Excel (.xlsx) file
+        <br><input type="file" accept=".xlsx" onchange="_importFile(event)" style="margin-top:1rem;"/>
+      </p>
+    </div>
+    <div class="alert alert-info small">
+      <b>Expected columns:</b> Group, Member, Status, Project, Contribution, Date
+      <br>Example: Group 1, John Doe, active, Building Fund, 5000, 2025-08-01
+    </div>
+    ${state.importError ? `<div class="alert alert-danger">${state.importError}</div>` : ""}
+    ${state.imported ? `<div class="alert alert-success">Data imported! Go to Summary or Groups to view.</div>` : ""}
+  </div>`;
+}
+function exportPage() {
+  window._exportData = function(fmt, selectedGroupId = null) {
+    let rows = [];
+    let groupsToExport = selectedGroupId ? [state.groups.find(g => g.id == selectedGroupId)] : state.groups;
+
+    groupsToExport.filter(g => g).forEach(g => {
+      g.contributions.forEach(c => {
+        const m = g.members.find(m=>m.name===c.member) || {};
+        rows.push({
+          Group: g.name,
+          Member: c.member,
+          Status: m.status || '',
+          Project: c.project,
+          Contribution: c.amount,
+          Date: c.date || '',
+        });
+      });
+    });
+
+    const titleSuffix = selectedGroupId ? ` - ${state.groups.find(g => g.id == selectedGroupId)?.name || 'Selected Group'}` : '';
+
+    if (fmt==='xlsx') {
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Records");
+      XLSX.writeFile(workbook, `pag_groups${titleSuffix.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`);
+    } else if (fmt==='pdf') {
+      const doc = new window.jspdf.jsPDF();
+      let y = 10;
+      doc.text(`PAG Group Records${titleSuffix}`, 10, y);
+      y += 10;
+      rows.slice(0,40).forEach(row => {
+        doc.text(`${row.Group} | ${row.Member} | ${row.Status} | ${row.Project} | ${row.Contribution} | ${row.Date}`, 10, y);
+        y += 7;
+        if (y>270) { doc.addPage(); y=10; }
+      });
+      doc.save(`pag_groups${titleSuffix.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`);
+    }
+  };
+
+  window._printGroupReport = function() {
+    const selectedGroupId = document.getElementById('groupSelect').value;
+    const group = selectedGroupId ? state.groups.find(g => g.id == selectedGroupId) : null;
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    const printContent = generatePrintableReport(group, selectedGroupId === 'all');
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  function generatePrintableReport(group, isAllGroups) {
+    const currentDate = new Date().toLocaleDateString();
+    const currentTime = new Date().toLocaleTimeString();
+
+    if (isAllGroups) {
+      // Generate report for all groups
+      let groupsHtml = state.groups.map(g => {
+        const stats = getGroupStats(g);
+        return `
+          <div class="group-section">
+            <h3>${g.name}</h3>
+            <p><strong>Leader:</strong> ${g.leader || 'None assigned'}</p>
+            <p><strong>Total Members:</strong> ${stats.totalMembers} | <strong>Projects:</strong> ${stats.totalProjects} | <strong>Total Contributions:</strong> KES ${stats.totalContributions.toLocaleString()}</p>
+
+            <div class="subsection">
+              <h4>Members (${g.members.length})</h4>
+              <ul>
+                ${g.members.map(m => `<li>${m.name} <em>(${m.status})</em></li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="subsection">
+              <h4>Projects (${g.projects.length})</h4>
+              <ul>
+                ${g.projects.map(p => `<li>${p.name} <em>(${p.date})</em></li>`).join('')}
+              </ul>
+            </div>
+
+            <div class="subsection">
+              <h4>Recent Contributions (${g.contributions.length})</h4>
+              <table class="print-table">
+                <thead>
+                  <tr><th>Member</th><th>Amount</th><th>Project</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                  ${g.contributions.slice(-10).map(c => `
+                    <tr>
+                      <td>${c.member}</td>
+                      <td>KES ${c.amount?.toLocaleString()}</td>
+                      <td>${c.project}</td>
+                      <td>${c.date}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>PAG Mathare North Assembly - All Groups Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+            .header { text-align: center; border-bottom: 2px solid #2176ae; padding-bottom: 10px; margin-bottom: 20px; }
+            .header h1 { color: #2176ae; margin: 0; }
+            .header p { margin: 5px 0; color: #666; }
+            .group-section { page-break-inside: avoid; margin-bottom: 30px; border: 1px solid #ddd; padding: 15px; }
+            .group-section h3 { color: #2176ae; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+            .subsection { margin: 15px 0; }
+            .subsection h4 { color: #333; margin-bottom: 8px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .print-table th, .print-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            .print-table th { background-color: #f5f5f5; font-weight: bold; }
+            ul { margin: 5px 0; padding-left: 20px; }
+            @media print { .group-section { page-break-inside: avoid; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>PAG Mathare North Assembly</h1>
+            <h2>All Groups Comprehensive Report</h2>
+            <p>Generated on: ${currentDate} at ${currentTime}</p>
+          </div>
+          ${groupsHtml}
+        </body>
+        </html>
+      `;
+    } else if (group) {
+      // Generate report for specific group
+      const stats = getGroupStats(group);
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>PAG Mathare North Assembly - ${group.name} Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+            .header { text-align: center; border-bottom: 2px solid #2176ae; padding-bottom: 10px; margin-bottom: 20px; }
+            .header h1 { color: #2176ae; margin: 0; }
+            .header p { margin: 5px 0; color: #666; }
+            .summary { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+            .summary h3 { margin-top: 0; color: #2176ae; }
+            .section { margin-bottom: 30px; }
+            .section h3 { color: #2176ae; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .print-table th, .print-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            .print-table th { background-color: #f5f5f5; font-weight: bold; }
+            ul { margin: 5px 0; padding-left: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>PAG Mathare North Assembly</h1>
+            <h2>${group.name} Detailed Report</h2>
+            <p>Generated on: ${currentDate} at ${currentTime}</p>
+          </div>
+
+          <div class="summary">
+            <h3>Group Summary</h3>
+            <p><strong>Group Leader:</strong> ${group.leader || 'None assigned'}</p>
+            <p><strong>Total Members:</strong> ${stats.totalMembers}</p>
+            <p><strong>Total Projects:</strong> ${stats.totalProjects}</p>
+            <p><strong>Total Contributions:</strong> KES ${stats.totalContributions.toLocaleString()}</p>
+          </div>
+
+          <div class="section">
+            <h3>Members (${group.members.length})</h3>
+            <table class="print-table">
+              <thead>
+                <tr><th>#</th><th>Name</th><th>Status</th><th>Total Contributions</th></tr>
+              </thead>
+              <tbody>
+                ${group.members.map((m, i) => {
+                  const memberTotal = group.contributions
+                    .filter(c => c.member === m.name)
+                    .reduce((sum, c) => sum + Number(c.amount || 0), 0);
+                  return `
+                    <tr>
+                      <td>${i + 1}</td>
+                      <td>${m.name}</td>
+                      <td>${m.status}</td>
+                      <td>KES ${memberTotal.toLocaleString()}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h3>Projects (${group.projects.length})</h3>
+            <table class="print-table">
+              <thead>
+                <tr><th>#</th><th>Project Name</th><th>Date</th><th>Total Contributions</th></tr>
+              </thead>
+              <tbody>
+                ${group.projects.map((p, i) => {
+                  const projectTotal = group.contributions
+                    .filter(c => c.project === p.name)
+                    .reduce((sum, c) => sum + Number(c.amount || 0), 0);
+                  return `
+                    <tr>
+                      <td>${i + 1}</td>
+                      <td>${p.name}</td>
+                      <td>${p.date}</td>
+                      <td>KES ${projectTotal.toLocaleString()}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section">
+            <h3>All Contributions (${group.contributions.length})</h3>
+            <table class="print-table">
+              <thead>
+                <tr><th>#</th><th>Member</th><th>Amount</th><th>Project</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                ${group.contributions.map((c, i) => `
+                  <tr>
+                    <td>${i + 1}</td>
+                    <td>${c.member}</td>
+                    <td>KES ${c.amount?.toLocaleString()}</td>
+                    <td>${c.project}</td>
+                    <td>${c.date}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </body>
+        </html>
+      `;
+    } else {
+      alert('Please select a group to print');
+      return '';
+    }
+  }
+
+  return `<div>
+    <h2 style="color:#2176ae;font-weight:bold;">Export or Print Data</h2>
+
+    <!-- Group Selection for Printing -->
+    <div class="card mb-4" style="border: 1px solid #2176ae; border-radius: 8px;">
+      <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+        🖨️ Print Group Reports
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-4">
+            <label for="groupSelect" class="form-label"><strong>Select Group:</strong></label>
+            <select id="groupSelect" class="form-select">
+              <option value="all">All Groups (Summary)</option>
+              ${state.groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-secondary" onclick="_printGroupReport()" style="margin-top: 25px;">
+              🖨️ Print Selected Report
+            </button>
+          </div>
+          <div class="col-md-4">
+            <small class="text-muted">Select a specific group for detailed report or "All Groups" for summary overview.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="d-flex flex-wrap gap-3" style="margin-bottom:1.5rem;">
+      <button class="btn btn-success" onclick="_exportData('xlsx')">⬇️ Download All (Excel)</button>
+      <button class="btn btn-primary" onclick="_exportData('pdf')">⬇️ Download All (PDF)</button>
+      <button class="btn btn-outline-success" onclick="_exportData('xlsx', document.getElementById('groupSelect').value === 'all' ? null : document.getElementById('groupSelect').value)">⬇️ Download Selected (Excel)</button>
+      <button class="btn btn-outline-primary" onclick="_exportData('pdf', document.getElementById('groupSelect').value === 'all' ? null : document.getElementById('groupSelect').value)">⬇️ Download Selected (PDF)</button>
+      <button class="btn btn-outline-primary" onclick="refreshData()">🔄 Refresh</button>
+    </div>
+
+    <div class="alert alert-info mt-3">
+      <strong>How to use:</strong><br>
+      • <strong>Print Reports:</strong> Select a group and click "Print Selected Report" for a detailed, printer-friendly report<br>
+      • <strong>Download:</strong> Export data as Excel or PDF files for offline use or sharing<br>
+      • <strong>All vs Selected:</strong> Choose "All Groups" for complete data or select specific groups
+    </div>
+  </div>`;
+}
+function editPanel() {
+  window._editGroupName = function(i) {
+    const newName = prompt('Rename group:', state.groups[i].name);
+    if (newName && newName.length>1) {
+      updateGroup(i, {name: newName});
+    }
+  };
+  window._editMemberName = function(i, oldName) {
+    const newName = prompt('Rename member:', oldName);
+    if (newName && newName.length>1) {
+      const group = state.groups[i];
+      const updatedMembers = group.members.map(m=>m.name===oldName?{...m,name:newName}:m);
+      const updatedContribs = group.contributions.map(c=>c.member===oldName?{...c,member:newName}:c);
+      updateGroup(i, {members: updatedMembers, contributions: updatedContribs});
+    }
+  };
+  window._editProjectName = function(i, oldName) {
+    const newName = prompt('Rename project:', oldName);
+    if (newName && newName.length>1) {
+      const group = state.groups[i];
+      const updatedProjects = group.projects.map(p=>p.name===oldName?{...p,name:newName}:p);
+      const updatedContribs = group.contributions.map(c=>c.project===oldName?{...c,project:newName}:c);
+      updateGroup(i, {projects: updatedProjects, contributions: updatedContribs});
+    }
+  };
+  function updateGroup(groupIdx, newData) {
+    const newGroups = state.groups.map((g,i) => i===groupIdx ? {...g, ...newData} : g);
+    setState({groups: newGroups});
+  }
+  return `<div>
+    <h2 style="color:#2176ae;font-weight:bold;">Edit Panel
+      <button class="btn btn-outline-primary btn-sm refresh-btn" onclick="refreshData()" style="margin-left:10px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+          <path d="M2 2a.5.5 0 0 1 .5.5V5a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1 0-1h.793A6.5.5 0 1 1 8 14.5a.5.5 0 0 1 0-1A5.5 5.5 0 1 0 2.5 5h.793A.5.5 0 0 1 2 5V2.5A.5.5 0 0 1 2.5 2z"/>
+        </svg>
+        Refresh
+      </button>
+    </h2>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr style="background:#eaf6ff;">
+            <th>Group</th><th>Rename</th><th>Members</th><th>Projects</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${state.groups.map((g,i) => `
+            <tr>
+              <td><span style="font-weight:500;color:#2176ae">${g.name}</span></td>
+              <td><button class="edit-btn" onclick="_editGroupName(${i})">Rename</button></td>
+              <td>
+                ${g.members.map(m =>
+                  `<span style="margin-right:8px;">
+                    ${m.name}
+                    <button class="edit-btn ms-1" onclick="_editMemberName(${i},'${m.name}')">Rename</button>
+                  </span>`
+                ).join('')}
+              </td>
+              <td>
+                ${g.projects.map(p =>
+                  `<span style="margin-right:8px;">
+                    ${p.name}
+                    <button class="edit-btn ms-1" onclick="_editProjectName(${i},'${p.name}')">Rename</button>
+                  </span>`
+                ).join('')}
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-warning small" style="margin-top:1.3rem;">
+      <b>All edits are permanent!</b> Please double check before renaming or deleting records.
+    </div>
+  </div>`;
+}
+
+// Projects Page
+function projectsPage() {
+  const allProjects = [];
+  state.groups.forEach(group => {
+    group.projects.forEach(project => {
+      const projectContribs = group.contributions.filter(c => c.project === project.name);
+      const totalAmount = projectContribs.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+      const status = getProjectStatus(project, group.contributions);
+
+      allProjects.push({
+        ...project,
+        group: group.name,
+        totalAmount,
+        contributionsCount: projectContribs.length,
+        status
+      });
+    });
+  });
+
+  // Sort by total amount descending
+  allProjects.sort((a, b) => b.totalAmount - a.totalAmount);
+
+  return `
+    <div>
+      <h2 style="color:#2176ae;font-weight:bold;">All Projects Overview</h2>
+      <div class="alert alert-info mb-4">
+        <strong>📊 Project Status Indicators:</strong><br>
+        ${getProjectStatusBadge('ongoing')} - Active projects with recent contributions<br>
+        ${getProjectStatusBadge('completed')} - Projects marked as complete or inactive for 90+ days<br>
+        ${getProjectStatusBadge('cancelled')} - Projects that have been cancelled
+      </div>
+
+      ${allProjects.length === 0 ?
+        '<div class="alert alert-warning">No projects found. Add projects in individual group pages.</div>' :
+        `<div class="table-responsive">
+          <table class="table table-bordered">
+            <thead style="background:#eaf6ff;">
+              <tr>
+                <th>#</th>
+                <th>Project Name</th>
+                <th>Group</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>Total Contributions</th>
+                <th>Contributors</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${allProjects.map((project, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td><strong>${project.name}</strong></td>
+                  <td><span class="badge bg-secondary">${project.group}</span></td>
+                  <td>${getProjectStatusBadge(project.status)}</td>
+                  <td>${project.date || '<span class="text-muted">Not set</span>'}</td>
+                  <td><strong style="color:#1c9c41;">KES ${project.totalAmount.toLocaleString()}</strong></td>
+                  <td>${project.contributionsCount}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`
+      }
+
+      <div class="mt-4">
+        <button class="btn btn-outline-primary" onclick="refreshData()">
+          🔄 Refresh Data
+        </button>
+        <button class="btn btn-outline-secondary ms-2" onclick="setState({page:'export'})">
+          📊 Export Projects Data
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Member Search Page
+function memberSearchPage() {
+  window._searchMembers = function() {
+    const searchTerm = document.getElementById('memberSearchInput').value;
+    const results = searchMembers(searchTerm);
+
+    const resultsContainer = document.getElementById('searchResults');
+
+    if (!searchTerm || searchTerm.length < 2) {
+      resultsContainer.innerHTML = '<div class="alert alert-info">Please enter at least 2 characters to search.</div>';
+      return;
+    }
+
+    if (results.length === 0) {
+      resultsContainer.innerHTML = '<div class="alert alert-warning">No members found matching your search.</div>';
+      return;
+    }
+
+    resultsContainer.innerHTML = `
+      <div class="search-results">
+        ${results.map(member => {
+          const eligibility = member.helpEligibility;
+          let eligibilityClass, eligibilityText;
+
+          switch (eligibility.level) {
+            case 'eligible':
+              eligibilityClass = 'help-eligible';
+              eligibilityText = `✅ Eligible for Help (Score: ${eligibility.score}/100)`;
+              break;
+            case 'review':
+              eligibilityClass = 'help-review';
+              eligibilityText = `⚠️ Needs Review (Score: ${eligibility.score}/100)`;
+              break;
+            default:
+              eligibilityClass = 'help-not-eligible';
+              eligibilityText = `❌ Not Eligible (Score: ${eligibility.score}/100)`;
+          }
+
+          return `
+            <div class="search-result-item">
+              <div class="member-performance">
+                <div>
+                  <h5 style="color:#2176ae; margin-bottom: 0.5rem;">${member.name}</h5>
+                  <div><strong>Groups:</strong> ${member.groups.join(', ') || 'None'}</div>
+                  <div><strong>Status:</strong> <span class="badge ${member.status === 'active' ? 'bg-success' : member.status === 'inactive' ? 'bg-warning' : 'bg-secondary'}">${member.status}</span></div>
+                  <div><strong>Last Activity:</strong> ${member.lastActivity ? member.lastActivity.toLocaleDateString() : 'Never'}</div>
+                </div>
+
+                <div class="performance-metrics">
+                  <div class="metric">
+                    <div class="metric-value">KES ${member.totalContributions.toLocaleString()}</div>
+                    <div class="metric-label">Total Contributions</div>
+                  </div>
+                  <div class="metric">
+                    <div class="metric-value">${member.projectsParticipated.length}</div>
+                    <div class="metric-label">Projects</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="help-eligibility ${eligibilityClass}">
+                ${eligibilityText}
+              </div>
+
+              ${eligibility.reasons.length > 0 ? `
+                <div class="mt-2">
+                  <small><strong>Reasons:</strong> ${eligibility.reasons.join(', ')}</small>
+                </div>
+              ` : ''}
+
+              ${member.projectsParticipated.length > 0 ? `
+                <div class="mt-2">
+                  <small><strong>Projects Participated:</strong> ${member.projectsParticipated.join(', ')}</small>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  };
+
+  return `
+    <div>
+      <h2 style="color:#2176ae;font-weight:bold;">Member Search & Performance</h2>
+
+      <div class="member-search-container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="d-flex gap-2">
+              <input
+                type="text"
+                id="memberSearchInput"
+                class="form-control"
+                placeholder="Search by member name..."
+                oninput="_searchMembers()"
+                style="border-radius: 8px;"
+              />
+              <button class="btn btn-primary" onclick="_searchMembers()">
+                🔍 Search
+              </button>
+            </div>
+          </div>
+          <div class="col-md-4 text-end">
+            <button class="btn btn-outline-primary" onclick="refreshData()">
+              🔄 Refresh Data
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <small class="text-muted">
+            <strong>Search Tips:</strong> Enter any part of a member's name to find their performance data,
+            contribution history, and help eligibility status.
+          </small>
+        </div>
+      </div>
+
+      <div id="searchResults" class="mt-3">
+        <div class="alert alert-info">
+          <strong>How to use Member Search:</strong><br>
+          • Type a member's name in the search box above<br>
+          • View their total contributions and project participation<br>
+          • Check their help eligibility status based on contribution criteria<br>
+          • See which groups they belong to and their current status
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="alert alert-info">
+          <strong>📊 Help Eligibility Criteria:</strong><br>
+          • <strong>Contributions:</strong> Minimum KES 5,000 (40% weight)<br>
+          • <strong>Projects:</strong> Minimum 2 projects participated (30% weight)<br>
+          • <strong>Activity:</strong> Recent activity within 180 days (20% weight)<br>
+          • <strong>Status:</strong> Active member status (10% weight)<br>
+          <em>Score ≥80: Eligible | Score ≥60: Needs Review | Score <60: Not Eligible</em>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Tithe Management Page
+function titheManagementPage() {
+  // Initialize tithe data if not exists
+  if (!state.titheMembers) {
+    state.titheMembers = [];
+  }
+  if (!state.tithes) {
+    state.tithes = [];
+  }
+  if (!state.titheSettings) {
+    state.titheSettings = {
+      churchName: 'PAG Mathare North Assembly',
+      currentYear: 2025,
+      currency: 'KES'
+    };
+  }
+
+  // Helper functions for tithe management
+  window._addTitheMember = function(e) {
+    e.preventDefault();
+    const name = e.target.memberName.value.trim();
+    const email = e.target.memberEmail.value.trim();
+    const phone = e.target.memberPhone.value.trim();
+
+    if (!name) {
+      alert('Please enter member name');
+      return;
+    }
+
+    const newMember = {
+      id: Date.now(),
+      name: name,
+      email: email,
+      phone: phone,
+      joinDate: new Date().toISOString().split('T')[0]
+    };
+
+    state.titheMembers.push(newMember);
+    saveState();
+    render();
+    e.target.reset();
+    alert('Member added successfully!');
+  };
+
+  window._deleteTitheMember = function(memberId) {
+    if (!confirm('Are you sure you want to delete this member? This will also delete all their tithe records.')) return;
+
+    state.titheMembers = state.titheMembers.filter(m => m.id !== memberId);
+    state.tithes = state.tithes.filter(t => t.memberId !== memberId);
+    saveState();
+    render();
+    alert('Member deleted successfully!');
+  };
+
+  window._addTithe = function(e) {
+    e.preventDefault();
+    const memberId = parseInt(e.target.titheMember.value);
+    const amount = parseFloat(e.target.titheAmount.value);
+    const date = e.target.titheDate.value;
+    const type = e.target.titheType.value;
+    const note = e.target.titheNote.value.trim();
+
+    if (!memberId || !amount || !date) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    if (amount <= 0) {
+      alert('Amount must be greater than 0');
+      return;
+    }
+
+    const newTithe = {
+      id: Date.now(),
+      memberId: memberId,
+      amount: amount,
+      date: date,
+      type: type,
+      note: note
+    };
+
+    state.tithes.push(newTithe);
+    saveState();
+    render();
+    e.target.reset();
+    alert('Tithe recorded successfully!');
+  };
+
+  window._deleteTithe = function(titheId) {
+    if (!confirm('Are you sure you want to delete this tithe record?')) return;
+
+    state.tithes = state.tithes.filter(t => t.id !== titheId);
+    saveState();
+    render();
+    alert('Tithe record deleted successfully!');
+  };
+
+  window._exportTitheData = function() {
+    const data = {
+      members: state.titheMembers,
+      tithes: state.tithes,
+      settings: state.titheSettings,
+      exportDate: new Date().toISOString()
+    };
+
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `tithe_data_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+
+    alert('Data exported successfully!');
+  };
+
+  window._printTitheReport = function() {
+    const selectedMonth = document.getElementById('reportMonth').value;
+    const selectedYear = document.getElementById('reportYear').value;
+
+    const monthlyTithes = state.tithes.filter(tithe => {
+      const titheDate = new Date(tithe.date);
+      return titheDate.getMonth() + 1 === parseInt(selectedMonth) && titheDate.getFullYear() === parseInt(selectedYear);
+    });
+
+    const monthNames = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Monthly Tithe Report - ${monthNames[selectedMonth]} ${selectedYear}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; }
+          .header { text-align: center; border-bottom: 2px solid #2176ae; padding-bottom: 10px; margin-bottom: 20px; }
+          .header h1 { color: #2176ae; margin: 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; font-weight: bold; }
+          .total { font-weight: bold; background-color: #e8f5e8; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${state.titheSettings.churchName}</h1>
+          <h2>Monthly Tithe Report - ${monthNames[selectedMonth]} ${selectedYear}</h2>
+          <p>Generated on: ${new Date().toLocaleDateString()}</p>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Member</th><th>Amount</th><th>Type</th><th>Note</th></tr>
+          </thead>
+          <tbody>
+            ${monthlyTithes.map(tithe => {
+              const member = state.titheMembers.find(m => m.id === tithe.memberId);
+              return `<tr>
+                <td>${new Date(tithe.date).toLocaleDateString()}</td>
+                <td>${member ? member.name : 'Unknown Member'}</td>
+                <td>${state.titheSettings.currency} ${parseFloat(tithe.amount).toLocaleString()}</td>
+                <td>${tithe.type}</td>
+                <td>${tithe.note || '-'}</td>
+              </tr>`;
+            }).join('')}
+            <tr class="total">
+              <td colspan="2">TOTAL</td>
+              <td>${state.titheSettings.currency} ${monthlyTithes.reduce((sum, t) => sum + parseFloat(t.amount), 0).toLocaleString()}</td>
+              <td colspan="2">${monthlyTithes.length} transactions</td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  // Calculate statistics
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+
+  const thisMonthTithes = state.tithes.filter(tithe => {
+    const titheDate = new Date(tithe.date);
+    return titheDate.getMonth() + 1 === currentMonth && titheDate.getFullYear() === currentYear;
+  });
+
+  const thisYearTithes = state.tithes.filter(tithe => {
+    const titheDate = new Date(tithe.date);
+    return titheDate.getFullYear() === currentYear;
+  });
+
+  const monthlyTotal = thisMonthTithes.reduce((sum, tithe) => sum + parseFloat(tithe.amount), 0);
+  const yearlyTotal = thisYearTithes.reduce((sum, tithe) => sum + parseFloat(tithe.amount), 0);
+  const avgTithe = thisMonthTithes.length > 0 ? monthlyTotal / thisMonthTithes.length : 0;
+
+  return `
+  <div>
+    <div class="hero-header">
+      <img src="https://img.icons8.com/ios-filled/90/ffffff/church--v1.png" alt="Church" style="margin-bottom:1rem;"/>
+      <h1>💰 Tithe Management System</h1>
+      <p>Comprehensive tithe tracking and member management for ${state.titheSettings.churchName}</p>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="dashboard-card text-white" style="background: linear-gradient(135deg, #28a745, #20c997);">
+          <div class="icon">💰</div>
+          <h4>${state.titheSettings.currency} ${monthlyTotal.toLocaleString()}</h4>
+          <p>Total This Month</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="dashboard-card text-white" style="background: linear-gradient(135deg, #007bff, #6610f2);">
+          <div class="icon">👥</div>
+          <h4>${state.titheMembers.length}</h4>
+          <p>Active Members</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="dashboard-card text-white" style="background: linear-gradient(135deg, #ffc107, #fd7e14);">
+          <div class="icon">📊</div>
+          <h4>${state.titheSettings.currency} ${avgTithe.toLocaleString()}</h4>
+          <p>Average Tithe</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="dashboard-card text-white" style="background: linear-gradient(135deg, #dc3545, #e83e8c);">
+          <div class="icon">📈</div>
+          <h4>${state.titheSettings.currency} ${yearlyTotal.toLocaleString()}</h4>
+          <p>Yearly Total</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Left Column: Forms -->
+      <div class="col-md-6">
+        <!-- Add Member Form -->
+        <div class="card mb-4">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            <h5>👤 Add New Member</h5>
+          </div>
+          <div class="card-body">
+            <form onsubmit="_addTitheMember(event)">
+              <div class="mb-3">
+                <label class="form-label">Full Name *</label>
+                <input type="text" name="memberName" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="memberEmail" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="tel" name="memberPhone" class="form-control">
+              </div>
+              <button type="submit" class="btn btn-primary">Add Member</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Record Tithe Form -->
+        <div class="card mb-4">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            <h5>💰 Record Tithe</h5>
+          </div>
+          <div class="card-body">
+            ${state.titheMembers.length === 0 ?
+              '<div class="alert alert-warning">Please add some members first before recording tithes.</div>' :
+              `<form onsubmit="_addTithe(event)">
+                <div class="mb-3">
+                  <label class="form-label">Member *</label>
+                  <select name="titheMember" class="form-control" required>
+                    <option value="">Select Member</option>
+                    ${state.titheMembers.map(member =>
+                      `<option value="${member.id}">${member.name}</option>`
+                    ).join('')}
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Amount *</label>
+                  <input type="number" name="titheAmount" class="form-control" step="0.01" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Date *</label>
+                  <input type="date" name="titheDate" class="form-control" value="${new Date().toISOString().split('T')[0]}" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Type</label>
+                  <select name="titheType" class="form-control">
+                    <option value="Regular Tithe">Regular Tithe</option>
+                    <option value="Special Offering">Special Offering</option>
+                    <option value="Building Fund">Building Fund</option>
+                    <option value="Mission Fund">Mission Fund</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Note</label>
+                  <textarea name="titheNote" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Record Tithe</button>
+              </form>`
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Data Tables -->
+      <div class="col-md-6">
+        <!-- Members List -->
+        <div class="card mb-4">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            <h5>👥 Members (${state.titheMembers.length})</h5>
+          </div>
+          <div class="card-body">
+            ${state.titheMembers.length === 0 ?
+              '<p class="text-muted">No members added yet.</p>' :
+              `<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <tr><th>Name</th><th>Contact</th><th>Total Contributed</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody>
+                    ${state.titheMembers.map(member => {
+                      const memberTithes = state.tithes.filter(t => t.memberId === member.id);
+                      const totalContributed = memberTithes.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+                      return `<tr>
+                        <td><strong>${member.name}</strong></td>
+                        <td><small>${member.email || 'N/A'}<br>${member.phone || 'N/A'}</small></td>
+                        <td><strong>${state.titheSettings.currency} ${totalContributed.toLocaleString()}</strong></td>
+                        <td>
+                          <button class="btn btn-sm btn-outline-danger" onclick="_deleteTitheMember(${member.id})">
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>`;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>`
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tithes -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+        <h5>💰 Recent Tithes (${state.tithes.length})</h5>
+        <div>
+          <button class="btn btn-sm btn-outline-primary" onclick="_exportTitheData()">📥 Export Data</button>
+        </div>
+      </div>
+      <div class="card-body">
+        ${state.tithes.length === 0 ?
+          '<p class="text-muted">No tithe records yet.</p>' :
+          `<div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr><th>Date</th><th>Member</th><th>Amount</th><th>Type</th><th>Note</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                ${state.tithes.slice(-10).reverse().map(tithe => {
+                  const member = state.titheMembers.find(m => m.id === tithe.memberId);
+                  return `<tr>
+                    <td>${new Date(tithe.date).toLocaleDateString()}</td>
+                    <td><strong>${member ? member.name : 'Unknown Member'}</strong></td>
+                    <td><strong style="color: #28a745;">${state.titheSettings.currency} ${parseFloat(tithe.amount).toLocaleString()}</strong></td>
+                    <td><span class="badge bg-primary">${tithe.type}</span></td>
+                    <td>${tithe.note || '-'}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-danger" onclick="_deleteTithe(${tithe.id})">
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>`
+        }
+      </div>
+    </div>
+
+    <!-- Monthly Report Section -->
+    <div class="card">
+      <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+        <h5>📊 Monthly Reports</h5>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-end mb-3">
+          <div class="col-md-3">
+            <label class="form-label">Month</label>
+            <select id="reportMonth" class="form-control">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8" ${currentMonth === 8 ? 'selected' : ''}>August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Year</label>
+            <select id="reportYear" class="form-control">
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+              <option value="2025" ${currentYear === 2025 ? 'selected' : ''}>2025</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-primary" onclick="_printTitheReport()">🖨️ Print Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function settingsPage() {
+  window._updateChurchName = async function() {
+    const newName = prompt('Enter new church name:', state.churchSettings.church_name);
+    if (newName && newName.trim() !== state.churchSettings.church_name) {
+      try {
+        await saveChurchSettings({ church_name: newName.trim() });
+        alert('Church name updated successfully!');
+      } catch (error) {
+        alert('Failed to update church name: ' + error.message);
+      }
+    }
+  };
+
+  window._uploadLogo = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+      return;
+    }
+
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size must be less than 2MB');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('logo', file);
+    formData.append('church_name', state.churchSettings.church_name);
+
+    try {
+      document.getElementById('upload-status').innerHTML = '<div class="text-info">Uploading...</div>';
+      await uploadChurchLogo(formData);
+      document.getElementById('upload-status').innerHTML = '<div class="alert alert-success">Logo uploaded successfully!</div>';
+      setTimeout(() => {
+        document.getElementById('upload-status').innerHTML = '';
+      }, 3000);
+    } catch (error) {
+      document.getElementById('upload-status').innerHTML = `<div class="alert alert-danger">Upload failed: ${error.message}</div>`;
+    }
+
+    // Clear the file input
+    event.target.value = '';
+  };
+
+  return `
+  <div>
+    <h2 style="color:#2176ae;font-weight:bold;">Church Settings</h2>
+
+    <div class="row">
+      <!-- Church Logo Section -->
+      <div class="col-md-6">
+        <div class="card" style="border: 1px solid #2176ae; border-radius: 12px;">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            🖼️ Church Logo
+          </div>
+          <div class="card-body text-center">
+            <div style="margin-bottom: 20px;">
+              <img src="${state.churchSettings.logo_url}"
+                   alt="Church Logo"
+                   style="max-width: 200px; max-height: 150px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+            </div>
+
+            <div class="upload-area" onclick="document.getElementById('logoInput').click()">
+              <span style="font-size:1.5rem;">📷</span><br>
+              <b>Click to Upload New Logo</b><br>
+              <small>Supported: JPEG, PNG, GIF, WebP (Max 2MB)</small>
+              <input type="file" id="logoInput" style="display:none"
+                     accept="image/jpeg,image/png,image/gif,image/webp"
+                     onchange="_uploadLogo(event)"/>
+            </div>
+
+            <div id="upload-status"></div>
+
+            <div class="alert alert-info small mt-3">
+              <b>Tips:</b>
+              <ul class="text-start mb-0">
+                <li>Upload a square image for best results</li>
+                <li>Recommended size: 200x200 pixels or larger</li>
+                <li>Logo will be used in reports and headers</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Church Name Section -->
+      <div class="col-md-6">
+        <div class="card" style="border: 1px solid #2176ae; border-radius: 12px;">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            ⛪ Church Information
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <label class="form-label"><b>Church Name:</b></label>
+              <div class="d-flex align-items-center gap-2">
+                <div class="flex-grow-1" style="padding: 8px 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+                  ${state.churchSettings.church_name}
+                </div>
+                <button class="btn btn-outline-primary btn-sm" onclick="_updateChurchName()">
+                  ✏️ Edit
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label"><b>Settings Info:</b></label>
+              <div style="font-size: 0.9rem; color: #666;">
+                <div>Created: ${new Date(state.churchSettings.created_at || '').toLocaleDateString()}</div>
+                <div>Last Updated: ${new Date(state.churchSettings.updated_at || '').toLocaleDateString()}</div>
+              </div>
+            </div>
+
+            <div class="alert alert-info small">
+              <b>Note:</b> Church name will appear in:<br>
+              • Page headers and navigation<br>
+              • Printed reports<br>
+              • Export files<br>
+              • Email signatures (if configured)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Status Section -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card" style="border: 1px solid #2176ae; border-radius: 12px;">
+          <div class="card-header" style="background: #eaf6ff; color: #2176ae; font-weight: bold;">
+            ⚙️ System Status
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <h6>Database Status</h6>
+                <span class="badge ${state.syncStatus === 'synced' ? 'bg-success' : state.syncStatus === 'syncing' ? 'bg-warning' : 'bg-danger'}">
+                  ${state.syncStatus === 'synced' ? '✅ Connected' : state.syncStatus === 'syncing' ? '⏳ Syncing' : '❌ Error'}
+                </span>
+              </div>
+              <div class="col-md-4">
+                <h6>Total Groups</h6>
+                <span class="badge bg-primary">${state.groups.length}</span>
+              </div>
+              <div class="col-md-4">
+                <h6>Total Members</h6>
+                <span class="badge bg-info">${state.groups.reduce((sum, g) => sum + g.members.length, 0)}</span>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <button class="btn btn-outline-primary" onclick="loadChurchSettings(); refreshData();">
+                🔄 Refresh Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function render() {
+  let main = '';
+  if (state.page==='home') main = homePage();
+  else if (state.page==='summary') main = dashboard();
+  else if (state.page==='ranking') main = rankingPage();
+  else if (state.page.startsWith('group-')) main = groupPage(state.activeGroup-1);
+  else if (state.page==='projects') main = projectsPage();
+  else if (state.page==='tithe-management') main = titheManagementPage();
+  else if (state.page==='member-search') main = memberSearchPage();
+  else if (state.page==='import') main = importPage();
+  else if (state.page==='export') main = exportPage();
+  else if (state.page==='edit') main = editPanel();
+  else if (state.page==='settings') main = settingsPage();
+  document.getElementById('app').innerHTML = `
+    ${navBar()}
+    <main class="container mt-3 mb-4">${main}</main>
+    <div class="footer text-center">
+      <div style="font-weight:600;letter-spacing:2px;">${state.churchSettings.church_name}</div>
+      <div style="font-size:0.96em;">&copy; ${new Date().getFullYear()} All rights reserved.</div>
+    </div>
+  `;
+}
+render();
+</script>
+<!-- Make sure Bootstrap JS is loaded properly for dropdowns to work -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Initialize all dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+  // Make sure dropdowns work after page renders
+  var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+  var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+    return new bootstrap.Dropdown(dropdownToggleEl);
+  });
+});
+</script>
+</body>
+</html>
